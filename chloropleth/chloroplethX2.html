@@ -8,8 +8,14 @@
         <script src="https://d3js.org/d3-queue.v2.min.js"></script>
 
         <script src="https://d3js.org/d3.v4.min.js" charset="utf-8"></script>
-	    <script src="https://d3js.org/topojson.v1.min.js"></script>
-
+		<!-- Maybe the missing piece is this geo? -->
+		<script src="https://d3js.org/d3-geo.v1.min.js"></script>
+	    <script src="https://d3js.org/topojson.v2.min.js"></script>
+		
+		<script src="https://d3.js.org/d3-queue.v2.min.js"></script>
+<!--		
+		<script src="counties.json"></script>
+-->
         <style type="text/css">
             #tooltip {
                 position: absolute;
@@ -119,11 +125,12 @@ function kickit (error, us) {
                 } /* End of Inner For */
             } /* End of Outer For */
 
-            const dataCounties = topojson.feature(data, data.objects.counties.geometries);
+            //const dataCounties = topojson.feature(data, data.objects.counties.geometries);
 
             svg.selectAll('path')
-            .data(dataCounties)
-            //.data(data.objects.counties.geometries)
+            //.data(dataCounties)
+			.data(data.objects.counties.geometries)
+            //.data(toposjon.feature(data, data.objects.counties.geometries).features)
             .enter()
             .append('path')
             .style("stroke", "#e0e0e0")
