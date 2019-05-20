@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <meta charset="utf-8">
-        <title>Chloropleth project for FCC cert</title>
+        <title>Chloropleth3</title>
         <script src='../jquery-3.3.1.min.js'></script>
 
         <script src="https://d3js.org/d3-queue.v2.min.js"></script>
@@ -105,7 +105,7 @@ function kickit (error, us) {
 
         d3.json ('counties.json', function (error, us) {
 
-            //counties = topojson.feature(us, us.objects.counties);
+            counties = topojson.feature(us, us.objects.counties);
 
             for (var i=0; i < edu.length; i++) {
                 const countyName = edu[i].area_name;
