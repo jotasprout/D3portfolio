@@ -13,24 +13,29 @@
     const height = 500;
 
     const projection = d3.geoAlbers()
-                       .scale(1000)
-                       .translate([width / 2, height / 2]);
+                         .scale(1000)
+                         .translate([width / 2, height / 2]);
 
     const path = d3.geoPath()
-                 .projection(projection);
+                   .projection(projection);
 
     const svg = d3.select("body").append("svg")
                   .attr("width", width)
                   .attr("height", height);
         
+    let edStates = [];
     // Queue up datasets using d3 Queue
     d3.queue()
         .defer(d3.json, "us.json") // Load US Counties
+        .defer(d3.json, "for_user_education.json")
         .await(ready); // Run 'ready' when JSONs are loaded
         
         // Ready Function, runs when data is loaded
-        function ready(error, us) {
+        function ready(error, us, ed) {
             if (error) throw error;
+
+            console.log(us);
+            console.log(ed);
 
             svg.append("g")
                 .attr("class", "counties")

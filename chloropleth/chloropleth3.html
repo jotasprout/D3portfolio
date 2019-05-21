@@ -72,7 +72,7 @@ margin = {
 // Map projection
 const projection = d3.geoAlbersUsa()
                      .translate([w/2, h/2])
-                     .scale([800]);
+                     .scale([1000]);
 
 // Path Generator
 const path = d3.geoPath()
@@ -105,13 +105,16 @@ function kickit (error, us) {
 
         d3.json ('counties.json', function (error, us) {
 
-            counties = topojson.feature(us, us.objects.counties);
+            const counties = topojson.feature(us, us.objects.counties);
+            console.log(counties);
 
             for (var i=0; i < edu.length; i++) {
                 const countyName = edu[i].area_name;
                 const stateName = edu[i].state;
                 const countyFips = edu[i].fips;
                 const bachelors = parseFloat(edu[i].bachelorsOrHigher);
+                console.log (countyName + " in " + stateName + " has " + bachelors + " smartypants.");
+
                 for (var j=0; j < counties.geometries.length; j++) {
                     const countyID = counties.geometries[j].id;
                     if (countyID == countyFips) {
