@@ -1,0 +1,104 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Learning TopoJSON and Queue</title>
+	<script src="https://d3js.org/d3.v4.min.js" charset="utf-8"></script>
+	<script src="https://d3js.org/topojson.v1.min.js"></script>
+	<script src="https://d3js.org/d3-queue.v2.min.js"></script>
+	<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+</head>
+
+<body>
+	
+<script>
+	
+const w = 720;
+const h = 540;
+	
+const myProjection = d3.geoAlbers()
+					 .scale(1000)
+					 .translate([w/2, h/2]);
+	
+const path = d3.geoPath()
+			   .projection(myProjection);
+	
+const svg = d3.select("body").append("svg")
+							 .attr("width", w)
+							 .attr("height", h);
+
+d3.queue()
+	.defer(d3.json, "us.json")
+	.defer(d3.json, "for_user_education.json")
+	.await(kickass);
+
+function kickass (error, us, ed) {
+	
+	if (error) throw error;
+	
+	d3.json("for_user_education.json", function(edu){
+		
+		const colorMin = d3.min(edu, function(d) {return d.bachelorsOrHigher});
+		const colorMax = d3.max(edu, function(d) {return d.bachelorsOrHigher});
+		const color = d3.scaleOrdinal()
+						.domain([colorMin, colorMax])
+						.range(d3.schemeBlues[9]);
+
+		d3.json("us.json", function (us){
+
+			const countiesObject = topojson.feature(us, us.objects.counties);
+
+			for (var e = 0; e < edu.length; e++) {
+				const eduFips = edu[e].fips;
+				const eduState = edu[e].state;
+				const eduCounty = edu[e].area_name;
+				const eduValue = parseFloat(edu[e].bachelorsOrHigher);
+				//console.log (eduCounty + " in " + eduState + " has " + eduValue + " smartypants.");
+
+				for (var c = 0; c < countiesObject.features.length; c++){
+					const countyObj = countiesObject.features[c];
+					const countyID = countiesObject.features[c].id;
+					//console.log ("eduFIPS is " + eduFips);
+					
+					if (eduFips == countyID){
+						//console.log("I found matching county ID " + countyID);
+						countyObj.countyName = eduCounty;
+						countyObj.countyState = eduState;
+						countyObj.countyValue = eduValue;
+						//console.log("This countyObj name is " + countyObj.countyName);
+						break;
+					}; // end of if eduFips equals countyID
+				}; // end of for each us chunk
+			}; // end of for each edu chunk
+			
+			console.log(countiesObject);
+		
+			svg.selectAll('path')
+			   .data(countiesObject.features)
+			   .enter()
+			   .append('path')
+			   .attr('d', path)
+			   .style('stroke', 'black')
+			   .style('fill', function(d){
+					let filling = d.countyValue;
+					if (filling) {
+						return color(filling);
+					} else {
+						return '#ccc';
+					}
+				}); // end of fill style
+		}); // end of us json
+			
+		}); // end of education json
+		
+	}; // end of kickass function
+
+
+	
+
+	
+</script>	
+	
+	
+</body>
+</html>
