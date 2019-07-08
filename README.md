@@ -1,5 +1,6 @@
-# D3portfolio
+# D3 portfolio
 Projects, practice, and portfolio
+
 ## Projects for Free Code Camp Data Viz Cert
 - Chloropleth
 - Column Chart
