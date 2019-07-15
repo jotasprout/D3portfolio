@@ -34,7 +34,6 @@ https://learn.freecodecamp.org/data-visualization/data-visualization-projects/vi
 https://codepen.io/freeCodeCamp/full/bgpXyK
 -->
 
-
 <div id="title"></div>
 <div id="forChart"></div>
 <script>
@@ -124,6 +123,12 @@ d3.json(datafile, function(dataset) {
 				return "blue";
 			};
 		})
+		.attr("data-xvalue", function(d){
+			return parseInt(d.Year);
+		})
+		.attr("data-yvalue", function(d){
+			return parseInt(d.Seconds);
+		})
 		.append("title")
 		.text(function(d){
 			return d.Name;
@@ -147,6 +152,9 @@ d3.json(datafile, function(dataset) {
 		.attr("id", "y-axis")
 		.attr("transform", "translate(" + margin.left + ",0)")
 		.call(yAxis);
+
+	svg.append("g")
+	   .attr("id", "legend");
 
 });		
 </script>	
