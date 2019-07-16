@@ -6,7 +6,6 @@
     <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1" />
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes"> 
-
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script src="https://d3js.org/d3.v4.min.js"></script>
 	<style>
@@ -40,8 +39,8 @@ https://codepen.io/freeCodeCamp/full/bgpXyK
 
 const datafile = 'data/cyclist-data.json';
 	
-const w = 1800;
-const h = 800;
+const w = 800;
+const h = 500;
 const margin = {
 	top: 25,
 	right: 25,
@@ -49,18 +48,20 @@ const margin = {
 	left: 50
 };
 	
-//const year = timeFormat('%Y');
-/*
+const strToYear = d3.timeParse('%Y');
+
+/**/
 const rowConverter = function(d){
 	return {
+		time: d.Time,
+		place: d.Place,
+		seconds: parseInt(d.Seconds),
 		name: d.Name,
-		year: parseTime(d.Year),
-		seconds: d.Seconds,
+		year: strToYear(d.Year),
 		nationality: d.Nationality,
-		place: d.Place
+		doping: d.Doping
 	};
 };
-*/
 	
 const forTitle = "Doping in Professional Bicycle Racing";
 const forSubTitle = "35 Fastest times up Alpe d'Huez";
@@ -83,11 +84,14 @@ d3.json(datafile, function(dataset) {
 
 	const artistTitle = d3.select("#title")
 						  .text(forTitle);
+
+	const firstYear = d3.min(dataset, function(d) { return d.Year; });		
+	const lastYear = d3.max(dataset, function(d) { return d.Year; });			  
 	
 	const xScale = d3.scaleLinear()
 					 .domain([
-					 d3.min(dataset, function(d) { return d.Year; }),
-					 d3.max(dataset, function(d) { return d.Year; })
+					 firstYear - 1,
+					 lastYear + 1
 					 ])
 					 .range([margin.left, w - margin.right]);
 
@@ -141,7 +145,10 @@ d3.json(datafile, function(dataset) {
 					.tickFormat(formatYear);
 	
 	const yAxis = d3.axisLeft()
-					.scale(yScale);
+					.scale(yScale)
+					.tickFormat(function(d){
+						return d3.time.format('%M%L');
+					});
 	
 	svg.append("g")
 		.attr("class", "axis")
