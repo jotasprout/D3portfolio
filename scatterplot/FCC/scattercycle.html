@@ -172,8 +172,12 @@ d3.json(datafile, function(dataset) {
 		.attr("transform", "translate(" + margin.left + ",0)")
 		.call(yAxis);
 
-	svg.append("g")
-	   .attr("id", "legend");
+	const legend = svg.append("g")
+	   				  .attr("id", "legend");
+
+	const legendItem = legend.append("g");
+
+	const legendRect = legendItem.append("rect");
 
 });		
 </script>	
