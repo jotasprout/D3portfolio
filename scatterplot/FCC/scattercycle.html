@@ -95,10 +95,18 @@ d3.json(datafile, function(dataset) {
 					 ])
 					 .range([margin.left, w - margin.right]);
 
-	const yScale = d3.scaleLinear()
+	const timeFormatting = "%M:%S";
+	const parseTimes = d3.timeParse(timeFormatting);
+	const timesParsing = dataset.map(function(d){
+		return parseTimes(d.Time);
+	});
+
+	const yScale = d3.scaleTime()
 					.domain([
-						d3.min(dataset, function(d) { return d.Seconds; }),
-						d3.max(dataset, function(d) { return d.Seconds; })
+						d3.min(timesParsing),
+						d3.max(timesParsing)
+						//d3.min(dataset, function(d) { return d.Seconds; }),
+						//d3.max(dataset, function(d) { return d.Seconds; })
 					])
 					.range([margin.top, h - margin.bottom]);
 
@@ -116,7 +124,8 @@ d3.json(datafile, function(dataset) {
 			return xScale(raceYear);
 		})
 		.attr("cy", function(d) {
-			let raceTime = parseInt(d.Seconds);
+			//let raceTime = parseInt(d.Seconds);
+			let raceTime = parseTimes(d.Time);
 			return yScale(raceTime);			
 		})
 		.attr("r", 5)
@@ -144,12 +153,15 @@ d3.json(datafile, function(dataset) {
 					.scale(xScale)
 					.tickFormat(formatYear);
 	
-	const yAxis = d3.axisLeft()
-					.scale(yScale)
-					.tickFormat(function(d){
-						return d3.time.format('%M%L');
-					});
+	//const yAxis = d3.axisLeft()
+	//				.scale(yScale);
 	
+	const yAxis = d3.axisLeft(yScale)
+					.tickValues(timesParsing)
+					.tickFormat(function(d){
+						return d3.timeFormat(timeFormatting)(d)
+					});
+
 	svg.append("g")
 		.attr("class", "axis")
 	   .attr("transform", "translate(0," + (h - margin.bottom) + ")")
