@@ -184,18 +184,24 @@ d3.json(datafile, function(dataset) {
 
 	const formatYear = d3.format("d");
 	
-	const xAxis = d3.axisBottom()
+    const xAxis = d3.axisBottom()
 					.scale(xScale)
 					.tickFormat(formatYear);
-/*
+/**/
     const myTicks = ['37:00', '37:15', '37:30', '37:45', '38:00', '38:15', '38:30', '38:45', '39:00', '39:15', '39:30', '39:45'];
-    */
+    
+    const tickParsing = myTicks.map(function(d){
+		return parseTimes(d);
+    });
+    
+    console.log(tickParsing);
     
 	const yAxis = d3.axisLeft(yScale)
-					.tickValues(timesParsing)
+                    //.tickValues(timesParsing)
+                    .tickValues(tickParsing)
 					.tickFormat(function(d){
 						return d3.timeFormat(timeFormatting)(d)
-					});
+                    });
 
 	svg.selectAll("circle")
         .data(dataset)
@@ -254,6 +260,8 @@ d3.json(datafile, function(dataset) {
         //.text(function(d){
         //  return d.Name;
         //});
+
+
 
 	svg.append("g")
 		.attr("class", "axis")
