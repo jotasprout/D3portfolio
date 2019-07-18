@@ -22,17 +22,59 @@
 			fill: black;
 		}
 
+        .title {
+            font: 24px sans-serif;
+            font-weight: bold;
+        }
+
+        .subtitle {
+            font: 18px sans-serif;
+        }
+
+        #forChart {
+            position: absolute;
+            width: 850px;
+        }
+
+        div.legend {
+            position: absolute;
+            right: 0px;
+            top: 400px; 
+        }
+
+        div.legend-row {
+            display: block;
+            height: 20px;
+            margin-bottom: 5px;
+        }
+
+        div.legend-box {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            right: 0px;
+        }
+
+        #doper {
+            background-color: blue;
+        }
+
+        #straight {
+            background-color: orange;
+        }
+
+
+
         div.tooltip {
             position: absolute;
             text-align: left;
             width: 100px;
-            height: 50px;
+            height: 42px;
             padding: 8px;
             font: 12px sans-serif;
             background: lightsteelblue;
             border: 0px;
             border-radius: 8px;
-            pointer-events: none;
         }
 	
 	</style>
@@ -52,15 +94,6 @@ https://codepen.io/freeCodeCamp/full/bgpXyK
 
 const datafile = 'data/cyclist-data.json';
 	
-const w = 800;
-const h = 500;
-const margin = {
-	top: 25,
-	right: 25,
-	bottom: 25,
-	left: 50
-};
-	
 const strToYear = d3.timeParse('%Y');
 
 /*
@@ -79,7 +112,17 @@ const rowConverter = function(d){
 
 const forTitle = "Doping in Professional Bicycle Racing";
 const forSubTitle = "35 Fastest times up Alpe d'Huez";
-	
+    
+const w = 900;
+const h = 700;
+
+const margin = {
+	top: 75,
+	right: 50,
+	bottom: 50,
+	left: 50
+};
+
 d3.json(datafile, function(dataset) {
 
     console.log(dataset); 
@@ -94,19 +137,23 @@ d3.json(datafile, function(dataset) {
                   .attr("class", "tooltip")
                   .style("opacity", 0);
 
+
+
     svg.append("text")
         .style("text-anchor", "middle")
         .attr("id", "title")
         .attr("x", w/2)
-        .attr("y", 50)
-        .text(forTitle);
+        .attr("y", margin.top - 50)
+        .text(forTitle)
+        .attr("class", "title");
 
     svg.append("text")
         .style("text-anchor", "middle")
         .attr("id", "subtitle")
         .attr("x", w/2)
-        .attr("y", 70)
-        .text(forSubTitle);
+        .attr("y", margin.top - 25)
+        .text(forSubTitle)
+        .attr("class", "subtitle");
 	
 	const doper = function (d) {
 		let doper = true;
@@ -179,19 +226,33 @@ d3.json(datafile, function(dataset) {
         };
         })
         .attr("data-xvalue", function(d){
-        return parseInt(d.Year);
+          return parseInt(d.Year);
         })
         .attr("data-yvalue", function(d){
-        return parseInt(d.Seconds);
+          return parseInt(d.Seconds);
         })
         .on("mouseover", function(d){
             div.transition()
-            .duration(200)
-            .style("opacity", .9);
-            div.html(d.Name + "<br>" + d.Nationality + "<br>" + d.Time)
-            .style("left", (d3.event.pageX) + "px")
-            .style("top", (d3.event.pageY - 28) + "px");
+               .duration(200)
+               .style("opacity", .9)
+               .attr("data-year", function (d) {
+                    return d.Year;
+                });
+            div.html(
+                 "<a href='" + d.URL + "' target='_blank'>" + d.Name + "</a>" +
+                 "<br>" + d.Nationality + " (" + d.Year + ")" +
+                 "<br>" + d.Time)
+               .style("left", (d3.event.pageX) + "px")
+               .style("top", (d3.event.pageY - 28) + "px");
         });
+
+        /*
+        .on("mouseout", function(d){
+            div.transition()
+               .duration(500)
+               .style("opacity", 0);
+        });
+        */
         //.append("title")
         //.text(function(d){
         //  return d.Name;
@@ -206,13 +267,33 @@ d3.json(datafile, function(dataset) {
 		.attr("id", "y-axis")
 		.attr("transform", "translate(" + margin.left + ",0)")
 		.call(yAxis);
+                         
+    const legend = d3.select("#forChart")
+                     .append("div")
+                       .attr("class", "legend")
+                       .attr("id", "legend")
+                     .append("div")
+                       .attr("class", "col");
 
-	const legend = svg.append("g")
-	   				  .attr("id", "legend");
+    const legendDoper = legend.append("div")
+                              .attr("class", "legend-row");
 
-	const legendItem = legend.append("g");
+    legendDoper.append("div")
+                 .attr("class", "legend-box")
+                 .attr("id", "doper");
 
-	const legendRect = legendItem.append("rect");
+    legendDoper.append("text")
+               .text("Riders with doping allegations");
+
+    const legendStraight = legend.append("div")
+                                 .attr("class", "legend-row");
+
+    legendStraight.append("div")
+                    .attr("class", "legend-box")
+                    .attr("id", "straight");   
+                    
+    legendStraight.append("text")
+                  .text("No doping allegations");                    
 
 });		
 </script>	
