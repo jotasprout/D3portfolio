@@ -6,6 +6,7 @@
     <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1" />
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes"> 
+
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script src="https://d3js.org/d3.v4.min.js"></script>
 	<style>
@@ -20,6 +21,19 @@
 			font-family: sans-serif;
 			fill: black;
 		}
+
+        div.tooltip {
+            position: absolute;
+            text-align: left;
+            width: 100px;
+            height: 50px;
+            padding: 8px;
+            font: 12px sans-serif;
+            background: lightsteelblue;
+            border: 0px;
+            border-radius: 8px;
+            pointer-events: none;
+        }
 	
 	</style>
 </head>
@@ -33,7 +47,6 @@ https://learn.freecodecamp.org/data-visualization/data-visualization-projects/vi
 https://codepen.io/freeCodeCamp/full/bgpXyK
 -->
 
-<div id="title"></div>
 <div id="forChart"></div>
 <script>
 
@@ -50,7 +63,7 @@ const margin = {
 	
 const strToYear = d3.timeParse('%Y');
 
-/**/
+/*
 const rowConverter = function(d){
 	return {
 		time: d.Time,
@@ -62,13 +75,38 @@ const rowConverter = function(d){
 		doping: d.Doping
 	};
 };
-	
+*/	
+
 const forTitle = "Doping in Professional Bicycle Racing";
 const forSubTitle = "35 Fastest times up Alpe d'Huez";
 	
 d3.json(datafile, function(dataset) {
 
-	console.log(dataset);
+    console.log(dataset); 
+
+    const svg = d3.select("#forChart")
+                        .append("svg")
+                        .attr("width", w)
+                        .attr("height", h); 
+
+    const div = d3.select("#forChart")
+                  .append("div")
+                  .attr("class", "tooltip")
+                  .style("opacity", 0);
+
+    svg.append("text")
+        .style("text-anchor", "middle")
+        .attr("id", "title")
+        .attr("x", w/2)
+        .attr("y", 50)
+        .text(forTitle);
+
+    svg.append("text")
+        .style("text-anchor", "middle")
+        .attr("id", "subtitle")
+        .attr("x", w/2)
+        .attr("y", 70)
+        .text(forSubTitle);
 	
 	const doper = function (d) {
 		let doper = true;
@@ -82,9 +120,6 @@ d3.json(datafile, function(dataset) {
 		return doper;
 	};
 
-	const artistTitle = d3.select("#title")
-						  .text(forTitle);
-
 	const firstYear = d3.min(dataset, function(d) { return d.Year; });		
 	const lastYear = d3.max(dataset, function(d) { return d.Year; });			  
 	
@@ -96,7 +131,9 @@ d3.json(datafile, function(dataset) {
 					 .range([margin.left, w - margin.right]);
 
 	const timeFormatting = "%M:%S";
+
 	const parseTimes = d3.timeParse(timeFormatting);
+
 	const timesParsing = dataset.map(function(d){
 		return parseTimes(d.Time);
 	});
@@ -105,62 +142,60 @@ d3.json(datafile, function(dataset) {
 					.domain([
 						d3.min(timesParsing),
 						d3.max(timesParsing)
-						//d3.min(dataset, function(d) { return d.Seconds; }),
-						//d3.max(dataset, function(d) { return d.Seconds; })
 					])
 					.range([margin.top, h - margin.bottom]);
 
-	var svg = d3.select("#forChart")
-		.append("svg")
-		.attr("width", w)
-		.attr("height", h);
-
-	svg.selectAll("circle")
-		.data(dataset)
-		.enter()
-		.append("circle")
-		.attr("cx", function (d) {
-			let raceYear = parseInt(d.Year);
-			return xScale(raceYear);
-		})
-		.attr("cy", function(d) {
-			//let raceTime = parseInt(d.Seconds);
-			let raceTime = parseTimes(d.Time);
-			return yScale(raceTime);			
-		})
-		.attr("r", 5)
-		.style("fill", function (d) {
-			if (d.Doping = '') {
-				return "orange";
-			} else {
-				return "blue";
-			};
-		})
-		.attr("data-xvalue", function(d){
-			return parseInt(d.Year);
-		})
-		.attr("data-yvalue", function(d){
-			return parseInt(d.Seconds);
-		})
-		.append("title")
-		.text(function(d){
-			return d.Name;
-		});
-	
 	const formatYear = d3.format("d");
 	
 	const xAxis = d3.axisBottom()
 					.scale(xScale)
 					.tickFormat(formatYear);
 	
-	//const yAxis = d3.axisLeft()
-	//				.scale(yScale);
-	
 	const yAxis = d3.axisLeft(yScale)
 					.tickValues(timesParsing)
 					.tickFormat(function(d){
 						return d3.timeFormat(timeFormatting)(d)
 					});
+
+	svg.selectAll("circle")
+        .data(dataset)
+        .enter()
+        .append("circle")
+        .attr("cx", function (d) {
+        let raceYear = parseInt(d.Year);
+        return xScale(raceYear);
+        })
+        .attr("cy", function(d) {
+        //let raceTime = parseInt(d.Seconds);
+        let raceTime = parseTimes(d.Time);
+        return yScale(raceTime);			
+        })
+        .attr("r", 5)
+        .style("fill", function (d) {
+        if (d.Doping = '') {
+            return "orange";
+        } else {
+            return "blue";
+        };
+        })
+        .attr("data-xvalue", function(d){
+        return parseInt(d.Year);
+        })
+        .attr("data-yvalue", function(d){
+        return parseInt(d.Seconds);
+        })
+        .on("mouseover", function(d){
+            div.transition()
+            .duration(200)
+            .style("opacity", .9);
+            div.html(d.Name + "<br>" + d.Nationality + "<br>" + d.Time)
+            .style("left", (d3.event.pageX) + "px")
+            .style("top", (d3.event.pageY - 28) + "px");
+        });
+        //.append("title")
+        //.text(function(d){
+        //  return d.Name;
+        //});
 
 	svg.append("g")
 		.attr("class", "axis")
