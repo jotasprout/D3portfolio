@@ -32,12 +32,10 @@ https://learn.freecodecamp.org/data-visualization/data-visualization-projects/vi
 https://codepen.io/freeCodeCamp/full/JEXgeY
 -->
 
-
-<div id="title"></div>
 <div id="forChart"></div>
 <script>
 
-const datafile = 'data/cyclist-data.json';
+const datafile = 'data/global-temperature.json';
 	
 const w = 1800;
 const h = 800;
@@ -48,21 +46,8 @@ const margin = {
 	left: 50
 };
 	
-//const year = timeFormat('%Y');
-/*
-const rowConverter = function(d){
-	return {
-		name: d.Name,
-		year: parseTime(d.Year),
-		seconds: d.Seconds,
-		nationality: d.Nationality,
-		place: d.Place
-	};
-};
-*/
-	
-const forTitle = "Doping in Professional Bicycle Racing";
-const forSubTitle = "35 Fastest times up Alpe d'Huez";
+const forTitle = "Monthly Global Land-Surface Temperature";
+const forSubTitle = "1753-2015: Base Temperature 8.66 degrees C";
 	
 d3.json(datafile, function(dataset) {
 
