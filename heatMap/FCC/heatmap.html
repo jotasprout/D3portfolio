@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>FCC Data Viz Project #4: Scatterplot</title>
+    <title>FCC Data Viz Project #5: Heat Map</title>
     <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1" />
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes"> 
@@ -10,12 +10,6 @@
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script src="https://d3js.org/d3.v4.min.js"></script>
 	<style>
-		.axis path,
-		.axis line {
-			fill: none;
-			stroke: black;
-			shape-rendering: crispEdges;
-		}
 		
 		.axis text {
 			font-family: sans-serif;
@@ -33,103 +27,50 @@ https://codepen.io/freeCodeCamp/full/JEXgeY
 -->
 
 <div id="forChart"></div>
+
 <script>
 
 const datafile = 'data/global-temperature.json';
 	
-const w = 1800;
+const w = 1000;
 const h = 800;
+
 const margin = {
-	top: 25,
-	right: 25,
-	bottom: 25,
+	top: 50,
+	right: 50,
+	bottom: 50,
 	left: 50
 };
 	
 const forTitle = "Monthly Global Land-Surface Temperature";
-const forSubTitle = "1753-2015: Base Temperature 8.66 degrees C";
+const forDescription = "1753-2015: Base Temperature 8.66 degrees C";
 	
 d3.json(datafile, function(dataset) {
 
 	console.log(dataset);
-	
-	const doper = function (d) {
-		let doper = true;
-		if (d.Doping = '') {
-			doper = false;
-		};
-		if (d.Doping != '') {
-			console.log (d.Doping);
-			doper = true; 
-		};
-		return doper;
-	};
 
-	const artistTitle = d3.select("#title")
-						  .text(forTitle);
-	
-	const xScale = d3.scaleLinear()
-					 .domain([
-					 d3.min(dataset, function(d) { return d.Year; }),
-					 d3.max(dataset, function(d) { return d.Year; })
-					 ])
-					 .range([margin.left, w - margin.right]);
+    const svg = d3.select("#forChart")
+                  .append("svg")
+                  .attr("width", w)
+                  .attr("height", h);
 
-	const yScale = d3.scaleLinear()
-					.domain([
-						d3.min(dataset, function(d) { return d.Seconds; }),
-						d3.max(dataset, function(d) { return d.Seconds; })
-					])
-					.range([margin.top, h - margin.bottom]);
+    svg.append("text")
+       .style("text-anchor", "middle")
+       .attr("id", "title")
+       .attr("x", w/2)
+       .attr("y", margin.top - 40)
+       .text(forTitle)
+       .attr("class", "title");
 
-	var svg = d3.select("#forChart")
-		.append("svg")
-		.attr("width", w)
-		.attr("height", h);
+    svg.append("text")
+       .style("text-anchor", "middle")
+       .attr("id", "description")
+       .attr("x", w/2)
+       .attr("y", margin.top - 15)
+       .text(forDescription)
+       .attr("class", "description");
 
-	svg.selectAll("circle")
-		.data(dataset)
-		.enter()
-		.append("circle")
-		.attr("cx", function (d) {
-			let raceYear = parseInt(d.Year);
-			return xScale(raceYear);
-		})
-		.attr("cy", function(d) {
-			let raceTime = parseInt(d.Seconds);
-			return yScale(raceTime);			
-		})
-		.attr("r", 5)
-		.style("fill", function (d) {
-			if (d.Doping = '') {
-				return "orange";
-			} else {
-				return "blue";
-			};
-		})
-		.append("title")
-		.text(function(d){
-			return d.Name;
-		});
-	
-	const formatYear = d3.format("d");
-	
-	const xAxis = d3.axisBottom()
-					.scale(xScale)
-					.tickFormat(formatYear);
-	
-	const yAxis = d3.axisLeft()
-					.scale(yScale);
-	
-	svg.append("g")
-		.attr("class", "axis")
-	   .attr("transform", "translate(0," + (h - margin.bottom) + ")")
-	   .call(xAxis);
-
-	svg.append("g")
-		.attr("id", "y-axis")
-		.attr("transform", "translate(" + margin.left + ",0)")
-		.call(yAxis);
+    
 
 });		
 </script>	
