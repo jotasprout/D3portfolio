@@ -1,79 +1,174 @@
 <!doctype html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <title>FCC Data Viz Project #5: Heat Map</title>
     <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1" />
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes"> 
+    <meta name="mobile-web-app-capable" content="yes">
 
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script src="https://d3js.org/d3.v4.min.js"></script>
-	<style>
-		
-		.axis text {
-			font-family: sans-serif;
-			fill: black;
-		}
-	
-	</style>
+
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.js"></script>
+    <style>
+        .axis text {
+            font-family: sans-serif;
+            fill: black;
+        }
+
+        .RdYlBu .q0-11 {
+            fill: rgb(165, 0, 38)
+        }
+
+        .RdYlBu .q1-11 {
+            fill: rgb(215, 48, 39)
+        }
+
+        .RdYlBu .q2-11 {
+            fill: rgb(244, 109, 67)
+        }
+
+        .RdYlBu .q3-11 {
+            fill: rgb(253, 174, 97)
+        }
+
+        .RdYlBu .q4-11 {
+            fill: rgb(254, 224, 144)
+        }
+
+        .RdYlBu .q5-11 {
+            fill: rgb(255, 255, 191)
+        }
+
+        .RdYlBu .q6-11 {
+            fill: rgb(224, 243, 248)
+        }
+
+        .RdYlBu .q7-11 {
+            fill: rgb(171, 217, 233)
+        }
+
+        .RdYlBu .q8-11 {
+            fill: rgb(116, 173, 209)
+        }
+
+        .RdYlBu .q9-11 {
+            fill: rgb(69, 117, 180)
+        }
+
+        .RdYlBu .q10-11 {
+            fill: rgb(49, 54, 149)
+        }
+    </style>
 </head>
 
 <body>
 <!--
+
 https://learn.freecodecamp.org/data-visualization/data-visualization-projects/visualize-data-with-a-heat-map
 
 https://codepen.io/freeCodeCamp/full/JEXgeY
+
 -->
 
-<div id="forChart"></div>
+    <div id="forChart"></div>
 
-<script>
+    <script>
 
-const datafile = 'data/global-temperature.json';
-	
-const w = 1000;
-const h = 800;
+        const datafile = 'data/global-temperature.json';
 
-const margin = {
-	top: 50,
-	right: 50,
-	bottom: 50,
-	left: 50
-};
-	
-const forTitle = "Monthly Global Land-Surface Temperature";
-const forDescription = "1753-2015: Base Temperature 8.66 degrees C";
-	
-d3.json(datafile, function(dataset) {
+        const w = 1000;
+        const h = 800;
 
-	console.log(dataset);
+        const margin = {
+            top: 100,
+            right: 100,
+            bottom: 50,
+            left: 50
+        };
 
-    const svg = d3.select("#forChart")
-                  .append("svg")
-                  .attr("width", w)
-                  .attr("height", h);
+        const forTitle = "Monthly Global Land-Surface Temperature";
+        const forDescription = "1753-2015: Base Temperature 8.66 degrees C";
 
-    svg.append("text")
-       .style("text-anchor", "middle")
-       .attr("id", "title")
-       .attr("x", w/2)
-       .attr("y", margin.top - 40)
-       .text(forTitle)
-       .attr("class", "title");
+        d3.json(datafile, function (dataset) {
 
-    svg.append("text")
-       .style("text-anchor", "middle")
-       .attr("id", "description")
-       .attr("x", w/2)
-       .attr("y", margin.top - 15)
-       .text(forDescription)
-       .attr("class", "description");
+            //console.log(dataset);
 
-    
+            const mv = dataset['monthlyVariance'];
+            //console.log(mv); 
 
-});		
-</script>	
+            const colorMin = d3.min(mv, (d) => {return d.variance});
+            //console.log(colorMin);
+            const colorMax = d3.max(mv, (d) => {return d.variance});
+            //console.log(colorMax);  
+
+            const x = d3.scaleLinear()
+                        .range([margin.left, (w - margin.right)]);
+
+            const y = d3.scaleLinear()
+                        .range([(h - margin.bottom), margin.top]);         
+
+            const variances = d3.set(mv.map((d) => {return d.variance})).values();
+            console.log(variances);
+
+            const years = d3.set(mv.map((d) => {return d.year})).values();
+            console.log(years);
+
+            x.domain(years);
+            y.domain(d3.extent(mv, (d) => {d.month}));
+
+            const color = d3.scaleQuantize()
+                            .domain([colorMin, colorMax])
+                            .range(['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']);
+
+            const svg = d3.select("#forChart")
+                .append("svg")
+                .attr("width", w)
+                .attr("height", h);
+
+            const tooltip = d3.select("#forChart")
+                .append("div")
+                .attr("class", "tooltip")
+                .attr("id", "tooltip");
+
+            svg.append("text")
+                .style("text-anchor", "middle")
+                .attr("id", "title")
+                .attr("x", w / 2)
+                .attr("y", margin.top - 50)
+                .text(forTitle)
+                .attr("class", "title");
+
+            svg.append("text")
+                .style("text-anchor", "middle")
+                .attr("id", "description")
+                .attr("x", w / 2)
+                .attr("y", margin.top - 20)
+                .text(forDescription)
+                .attr("class", "description");
+
+            const legend = d3.legendColor()
+                             .shapeWidth(20)
+                             .shapeHeight(20)
+                             .cells(11)
+                             .orient('vertical')
+                             .labelFormat(d3.format(".2"))
+                             .labelAlign("middle")
+                             .scale(color);
+
+            svg.append("g")
+                .attr("id", "legend")
+                .attr("class", "legend")
+                .attr("transform", "translate(" + [(w - margin.right), margin.top] + ")");
+
+            svg.select(".legend")
+                .call(legend);
+
+        });		
+    </script>
 
 </body>
 
