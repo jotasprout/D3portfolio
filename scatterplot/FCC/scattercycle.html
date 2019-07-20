@@ -256,15 +256,9 @@ d3.json(datafile, function(dataset) {
                .style("opacity", 0);
         });
         */
-        //.append("title")
-        //.text(function(d){
-        //  return d.Name;
-        //});
-
-
 
 	svg.append("g")
-		.attr("class", "axis")
+	   .attr("class", "axis")
 	   .attr("transform", "translate(0," + (h - margin.bottom) + ")")
 	   .call(xAxis);
 
@@ -272,7 +266,7 @@ d3.json(datafile, function(dataset) {
 		.attr("id", "y-axis")
 		.attr("transform", "translate(" + margin.left + ",0)")
 		.call(yAxis);
-        /* */                
+                        
     const legend = d3.select("#forChart")
                      .append("div")
                        .attr("class", "legend")
