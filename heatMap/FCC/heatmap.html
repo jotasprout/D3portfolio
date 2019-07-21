@@ -19,6 +19,18 @@
             fill: black;
         }
 
+        .tooltip {
+            position: absolute;
+            text-align: left;
+            width: 100px;
+            height: 36px;
+            padding: 8px;
+            font: 12px sans-serif;
+            background: lightsteelblue;
+            border: 0px;
+            border-radius: 8px;
+        }
+
         .title {
             font: 18px sans-serif;
             font-weight: bold;
@@ -123,14 +135,14 @@ https://codepen.io/freeCodeCamp/full/JEXgeY
             
             const variances = d3.set(mv.map((d) => {return d.variance})).values();
             const secnairav = variances.reverse();
-            console.log(variances);
+            //console.log(variances);
 
             const color = d3.scaleQuantize()
                             .domain(d3.extent(mv, d => d.variance))
                             .range(sroloc);
 
             const years = d3.set(mv.map((d) => {return d.year})).values();
-            console.log(years);
+            //console.log(years);
 
             const yearFormatting = "%Y";
 
@@ -165,6 +177,48 @@ https://codepen.io/freeCodeCamp/full/JEXgeY
                               .attr("id", "tooltip")
                               .style("opacity", 0);
 
+            function getMonth (d) {
+                let m = d.month;
+                switch (m) {
+                    case 1:
+                        return "Jan";
+                        break;
+                    case 2:
+                        return "Feb";
+                        break;
+                    case 3:
+                        return "Mar";
+                        break;
+                    case 4:
+                        return "Apr";
+                        break;
+                    case 5:
+                        return "May";
+                        break;
+                    case 6:
+                        return "Jun";
+                        break;
+                    case 7:
+                        return "Jul";
+                        break;
+                    case 8:
+                        return "Aug";
+                        break;
+                    case 9:
+                        return "Sep";
+                        break;                                                
+                    case 10:
+                        return "Oct";
+                        break;
+                    case 11:
+                        return "Nov";
+                        break;
+                    case 12:
+                        return "Dec";
+                        break;
+                };
+            };
+            
             svg.selectAll("rect")
                .data(mv)
                .enter()
@@ -191,11 +245,15 @@ https://codepen.io/freeCodeCamp/full/JEXgeY
                    return color(d.variance);
                })
                .on("mouseover", function(d){
-                   tooltip.attr("data-year", d.year)
+                   thisMonth = getMonth(d);
+                   tooltip.attr("data-year", d.year);
                    tooltip.transition()
                           .duration(200)
                           .style("opacity", .9);
-                   tooltip.html(d.year);
+                   tooltip.html((baseTemp + d.variance) + "&deg; C" +
+                            "<br>" + thisMonth + " " + d.year)
+                          .style("left", (d3.event.pageX) + "px")
+                          .style("top", (d3.event.pageY - 28) + "px");
                });
 
             const formatYear = d3.format("d");
@@ -219,8 +277,6 @@ https://codepen.io/freeCodeCamp/full/JEXgeY
                .attr("transform", "translate(" + margin.left + ",0)")
                .call(yAxis);
 
-
-
             svg.append("text")
                 .style("text-anchor", "middle")
                 .attr("id", "title")
@@ -230,12 +286,12 @@ https://codepen.io/freeCodeCamp/full/JEXgeY
                 .attr("class", "title");
 
             svg.append("text")
-                .style("text-anchor", "middle")
-                .attr("id", "description")
-                .attr("x", w / 2)
-                .attr("y", margin.top - 50)
-                .text(forDescription)
-                .attr("class", "description");
+               .style("text-anchor", "middle")
+               .attr("id", "description")
+               .attr("x", w / 2)
+               .attr("y", margin.top - 50)
+               .text(forDescription)
+               .attr("class", "description");
 
             const legend = d3.legendColor()
                              .shapeWidth(20)
@@ -247,12 +303,12 @@ https://codepen.io/freeCodeCamp/full/JEXgeY
                              .scale(color);
 
             svg.append("g")
-                .attr("id", "legend")
-                .attr("class", "legend")
-                .attr("transform", "translate(" + [(w - margin.right), margin.top] + ")");
+               .attr("id", "legend")
+               .attr("class", "legend")
+               .attr("transform", "translate(" + [(w - margin.right), margin.top] + ")");
 
             svg.select(".legend")
-                .call(legend);
+               .call(legend);
 
         });		
     </script>

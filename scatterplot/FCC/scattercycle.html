@@ -197,7 +197,6 @@ d3.json(datafile, function(dataset) {
     console.log(tickParsing);
     
 	const yAxis = d3.axisLeft(yScale)
-                    //.tickValues(timesParsing)
                     .tickValues(tickParsing)
 					.tickFormat(function(d){
 						return d3.timeFormat(timeFormatting)(d)
