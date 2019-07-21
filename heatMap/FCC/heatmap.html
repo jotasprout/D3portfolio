@@ -1,6 +1,16 @@
 <!doctype html>
 <html>
 
+<!--
+
+https://learn.freecodecamp.org/data-visualization/data-visualization-projects/visualize-data-with-a-heat-map
+
+https://roxorsoxor.com/poprock/forD3/heatmap/FCC/heatmap.html
+
+https://codepen.io/freeCodeCamp/full/JEXgeY
+
+-->
+
 <head>
     <meta charset="utf-8">
     <title>FCC Data Viz Project #5: Heat Map</title>
@@ -46,7 +56,7 @@
             stroke: black;
             shape-rendering: crispEdges;
         }
-
+/*
         .RdYlBu .q0-11 {
             fill: rgb(165, 0, 38)
         }
@@ -90,18 +100,11 @@
         .RdYlBu .q10-11 {
             fill: rgb(49, 54, 149)
         }
+*/
     </style>
 </head>
 
 <body>
-
-<!--
-
-https://learn.freecodecamp.org/data-visualization/data-visualization-projects/visualize-data-with-a-heat-map
-
-https://codepen.io/freeCodeCamp/full/JEXgeY
-
--->
 
     <div id="forChart"></div>
 
@@ -125,6 +128,12 @@ https://codepen.io/freeCodeCamp/full/JEXgeY
         d3.json(datafile, function (dataset) {
 
             const mv = dataset['monthlyVariance'];
+            console.log(mv);
+
+            const svg = d3.select("#forChart")
+                          .append("svg")
+                          .attr("width", w)
+                          .attr("height", h);
 
             const colorMin = d3.min(mv, (d) => {return d.variance});
             const colorMax = d3.max(mv, (d) => {return d.variance}); 
@@ -134,24 +143,61 @@ https://codepen.io/freeCodeCamp/full/JEXgeY
             const sroloc = colors.reverse();
             
             const variances = d3.set(mv.map((d) => {return d.variance})).values();
-            const secnairav = variances.reverse();
+            //const secnairav = variances.reverse();
             //console.log(variances);
 
             const color = d3.scaleQuantize()
                             .domain(d3.extent(mv, d => d.variance))
                             .range(sroloc);
 
-            const years = d3.set(mv.map((d) => {return d.year})).values();
+            //const years = d3.set(mv.map((d) => {return d.year})).values();
             //console.log(years);
 
             const yearFormatting = "%Y";
+            const monthFormatting = "%m";
 
             const parseYears = d3.timeParse(yearFormatting);
+            const parseMonths = d3.timeParse(monthFormatting);
+            
+            const xScale = d3.scaleTime()
+                             .domain(d3.extent(mv, function(d){
+                                 let year = parseYears(d.year)
+                                 return year
+                             }))
+                             .range([margin.left, (w - margin.right)]);
 
+            const xAxis = d3.axisBottom()
+                            .scale(xScale)
+                            .tickFormat(d3.timeFormat(yearFormatting));
+
+            svg.append("g")
+               .attr("class", "axis")
+               .attr("id", "x-axis")
+               .attr("transform", "translate(0," + (h - margin.bottom) + ")")
+               .call(xAxis);
+
+            const monthMin = parseMonths(d3.min(mv, (d) => {return d.month}));
+            const monthMax = parseMonths(d3.max(mv, (d) => {return d.month}));
+
+            const yScale = d3.scaleTime()
+                             .domain([monthMin, monthMax])
+                             .range([margin.top, (h - margin.bottom)]);
+
+            const yAxis = d3.axisLeft()
+                            .scale(yScale)
+                            .tickFormat(d3.timeFormat(monthFormatting));
+
+            svg.append("g")
+            .attr("class", "axis")
+            .attr("id", "y-axis")
+            .attr("transform", "translate(" + margin.left + ",0)")
+            .call(yAxis);
+
+            /*
             const tickParsing = years.map(function(d){
                 return parseYears(d.year);
             });
-
+            
             const xScale = d3.scaleLinear()
                              .domain([
                                  d3.min(tickParsing),
@@ -162,11 +208,13 @@ https://codepen.io/freeCodeCamp/full/JEXgeY
             const yScale = d3.scaleLinear()
                              .domain(d3.extent(mv, (d) => {d.month}))
                              .range([(h - margin.bottom), margin.top]); 
+            
+            const formatYear = d3.format("d");
 
-            const svg = d3.select("#forChart")
-                          .append("svg")
-                          .attr("width", w)
-                          .attr("height", h);
+            const xAxis = d3.axisBottom()
+                            .scale(xScale)
+                            .tickFormat(formatYear);
+            */
 
             const cellWidth = 5;
             const cellHeight = 20;
@@ -176,7 +224,7 @@ https://codepen.io/freeCodeCamp/full/JEXgeY
                               .attr("class", "tooltip")
                               .attr("id", "tooltip")
                               .style("opacity", 0);
-
+/**/
             function getMonth (d) {
                 let m = d.month;
                 switch (m) {
@@ -255,27 +303,6 @@ https://codepen.io/freeCodeCamp/full/JEXgeY
                           .style("left", (d3.event.pageX) + "px")
                           .style("top", (d3.event.pageY - 28) + "px");
                });
-
-            const formatYear = d3.format("d");
-
-            const xAxis = d3.axisBottom()
-                            .scale(xScale)
-                            .tickFormat(formatYear);
-
-            svg.append("g")
-               .attr("class", "axis")
-               .attr("id", "x-axis")
-               .attr("transform", "translate(0," + (h - margin.bottom) + ")")
-               .call(xAxis);
-
-            const yAxis = d3.axisLeft()
-                            .scale(yScale);
-            
-            svg.append("g")
-               .attr("class", "axis")
-               .attr("id", "y-axis")
-               .attr("transform", "translate(" + margin.left + ",0)")
-               .call(yAxis);
 
             svg.append("text")
                 .style("text-anchor", "middle")
