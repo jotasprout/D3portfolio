@@ -32,8 +32,8 @@ https://codepen.io/freeCodeCamp/full/JEXgeY
         .tooltip {
             position: absolute;
             text-align: left;
-            width: 100px;
-            height: 36px;
+            width: 72px;
+            height: 30px;
             padding: 8px;
             font: 12px sans-serif;
             background: lightsteelblue;
@@ -56,51 +56,7 @@ https://codepen.io/freeCodeCamp/full/JEXgeY
             stroke: black;
             shape-rendering: crispEdges;
         }
-/*
-        .RdYlBu .q0-11 {
-            fill: rgb(165, 0, 38)
-        }
 
-        .RdYlBu .q1-11 {
-            fill: rgb(215, 48, 39)
-        }
-
-        .RdYlBu .q2-11 {
-            fill: rgb(244, 109, 67)
-        }
-
-        .RdYlBu .q3-11 {
-            fill: rgb(253, 174, 97)
-        }
-
-        .RdYlBu .q4-11 {
-            fill: rgb(254, 224, 144)
-        }
-
-        .RdYlBu .q5-11 {
-            fill: rgb(255, 255, 191)
-        }
-
-        .RdYlBu .q6-11 {
-            fill: rgb(224, 243, 248)
-        }
-
-        .RdYlBu .q7-11 {
-            fill: rgb(171, 217, 233)
-        }
-
-        .RdYlBu .q8-11 {
-            fill: rgb(116, 173, 209)
-        }
-
-        .RdYlBu .q9-11 {
-            fill: rgb(69, 117, 180)
-        }
-
-        .RdYlBu .q10-11 {
-            fill: rgb(49, 54, 149)
-        }
-*/
     </style>
 </head>
 
@@ -198,29 +154,6 @@ https://codepen.io/freeCodeCamp/full/JEXgeY
             .attr("transform", "translate(" + margin.left + ",0)")
             .call(yAxis);
 
-            /*
-            const tickParsing = years.map(function(d){
-                return parseYears(d.year);
-            });
-            
-            const xScale = d3.scaleLinear()
-                             .domain([
-                                 d3.min(tickParsing),
-                                 d3.max(tickParsing)
-                             ])
-                             .range([margin.left, (w - margin.right)]);
-
-            const yScale = d3.scaleLinear()
-                             .domain(d3.extent(mv, (d) => {d.month}))
-                             .range([(h - margin.bottom), margin.top]); 
-            
-            const formatYear = d3.format("d");
-
-            const xAxis = d3.axisBottom()
-                            .scale(xScale)
-                            .tickFormat(formatYear);
-            */
-
             const tooltip = d3.select("#forChart")
                               .append("div")
                               .attr("class", "tooltip")
@@ -279,7 +212,6 @@ https://codepen.io/freeCodeCamp/full/JEXgeY
                .attr("x", function (d,i){
                    xCell = Math.floor(i/12) * 5 + margin.left;
                    return xCell;
-                   //return (margin.left + (i * 20));
                })
                .attr("y", function (d){
                    return (margin.top + ((d.month - 1) * 20));
@@ -296,11 +228,13 @@ https://codepen.io/freeCodeCamp/full/JEXgeY
                })
                .on("mouseover", function(d){
                    thisMonth = getMonth(d);
+                   tempFormat = d3.format(".3n");
+                   thisTemp = tempFormat(baseTemp + d.variance);
                    tooltip.attr("data-year", d.year);
                    tooltip.transition()
                           .duration(200)
                           .style("opacity", .9);
-                   tooltip.html((baseTemp + d.variance) + "&deg; C" +
+                   tooltip.html(thisTemp + "&deg; C" +
                             "<br>" + thisMonth + " " + d.year)
                           .style("left", (d3.event.pageX) + "px")
                           .style("top", (d3.event.pageY - 28) + "px");
