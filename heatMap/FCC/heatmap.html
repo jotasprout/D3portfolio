@@ -67,6 +67,7 @@ https://codepen.io/freeCodeCamp/full/JEXgeY
     <script>
 
         const datafile = 'data/global-temperature.json';
+        const datafile = 'https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/master/global-temperature.json';
 
         const w = 1500;
         const h = 400;
@@ -102,8 +103,6 @@ https://codepen.io/freeCodeCamp/full/JEXgeY
             const sroloc = colors.reverse();
             
             const variances = d3.set(mv.map((d) => {return d.variance})).values();
-            //const secnairav = variances.reverse();
-            //console.log(variances);
 
             const color = d3.scaleQuantize()
                             .domain(d3.extent(mv, d => d.variance))
@@ -125,7 +124,6 @@ https://codepen.io/freeCodeCamp/full/JEXgeY
                                  return year
                              }))
                              .range([margin.left, (margin.left + (years.length * 5))]);
-                             //.range([margin.left, (w - margin.right)]);
 
             const xAxis = d3.axisBottom()
                             .scale(xScale)
@@ -159,7 +157,7 @@ https://codepen.io/freeCodeCamp/full/JEXgeY
                               .attr("class", "tooltip")
                               .attr("id", "tooltip")
                               .style("opacity", 0);
-/**/
+
             function getMonth (d) {
                 let m = d.month;
                 switch (m) {
