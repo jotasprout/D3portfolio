@@ -117,10 +117,13 @@ https://codepen.io/freeCodeCamp/full/JEXgeY
 
         const margin = {
             top: 100,
-            right: 100,
+            right: 120,
             bottom: 60,
             left: 50
         };
+
+        const cellWidth = 5;
+        const cellHeight = 20;
 
         const forTitle = "Monthly Global Land-Surface Temperature";
         const forDescription = "1753-2015: Base Temperature 8.66 degrees C";
@@ -150,11 +153,12 @@ https://codepen.io/freeCodeCamp/full/JEXgeY
                             .domain(d3.extent(mv, d => d.variance))
                             .range(sroloc);
 
-            //const years = d3.set(mv.map((d) => {return d.year})).values();
-            //console.log(years);
+            const years = d3.set(mv.map((d) => {return d.year})).values();
+            console.log(years);
 
             const yearFormatting = "%Y";
             const monthFormatting = "%m";
+            const monthPretty = "%b";
 
             const parseYears = d3.timeParse(yearFormatting);
             const parseMonths = d3.timeParse(monthFormatting);
@@ -164,7 +168,8 @@ https://codepen.io/freeCodeCamp/full/JEXgeY
                                  let year = parseYears(d.year)
                                  return year
                              }))
-                             .range([margin.left, (w - margin.right)]);
+                             .range([margin.left, (margin.left + (years.length * 5))]);
+                             //.range([margin.left, (w - margin.right)]);
 
             const xAxis = d3.axisBottom()
                             .scale(xScale)
@@ -181,11 +186,11 @@ https://codepen.io/freeCodeCamp/full/JEXgeY
 
             const yScale = d3.scaleTime()
                              .domain([monthMin, monthMax])
-                             .range([margin.top, (h - margin.bottom)]);
+                             .range([(margin.top + cellHeight/2), (h - margin.bottom) - (cellHeight/2)]);
 
             const yAxis = d3.axisLeft()
                             .scale(yScale)
-                            .tickFormat(d3.timeFormat(monthFormatting));
+                            .tickFormat(d3.timeFormat(monthPretty));
 
             svg.append("g")
             .attr("class", "axis")
@@ -215,9 +220,6 @@ https://codepen.io/freeCodeCamp/full/JEXgeY
                             .scale(xScale)
                             .tickFormat(formatYear);
             */
-
-            const cellWidth = 5;
-            const cellHeight = 20;
 
             const tooltip = d3.select("#forChart")
                               .append("div")
